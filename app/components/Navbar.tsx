@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
@@ -13,31 +14,29 @@ export default function Navbar() {
         >
             <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-6 py-3 backdrop-blur-xl">
 
-                {/* Logo */}
-                <div className="text-xl font-bold tracking-widest text-white">
+                <Link href="/" className="text-xl font-bold tracking-widest text-white">
                     NEXUS<span className="text-purple-400">.</span>
-                </div>
+                </Link>
 
-                {/* Links */}
                 <div className="hidden items-center gap-8 text-sm text-gray-300 md:flex">
-                    <a href="#" className="transition hover:text-white">
+                    <Link href="/events" className="transition hover:text-white">
                         Events
-                    </a>
-
-                    <a href="#" className="transition hover:text-white">
-                        Speakers
-                    </a>
-
-                    <a href="#" className="transition hover:text-white">
-                        About
-                    </a>
+                    </Link>
+                    <Link href="/dashboard" className="transition hover:text-white">
+                        Dashboard
+                    </Link>
+                    <Link href="/dashboard/events" className="transition hover:text-white">
+                        Organizer
+                    </Link>
                 </div>
 
-                {/* Button */}
-                <button className="flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-105">
+                <Link
+                    href="/dashboard/events"
+                    className="flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-105"
+                >
                     Create Event
                     <ArrowUpRight size={16} />
-                </button>
+                </Link>
 
             </div>
         </motion.nav>

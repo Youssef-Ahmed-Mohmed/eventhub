@@ -81,7 +81,7 @@ export default function LiveAttendance() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="mt-5 text-7xl font-bold tracking-tight text-white md:text-8xl"
                             >
-                                {attendance.toLocaleString()}
+                                {attendance.toLocaleString("en-US")}
                             </motion.div>
 
                             <div className="mt-6 flex items-center justify-center gap-2 text-gray-400">

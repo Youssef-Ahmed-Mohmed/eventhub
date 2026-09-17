@@ -158,7 +158,7 @@ export default function EventsPage() {
 
                                 <div className="flex items-center gap-3">
                                     <Users size={17} />
-                                    {event.attendees.toLocaleString()} attendees
+                                    {event.attendees.toLocaleString("en-US")} attendees
                                 </div>
 
                             </div>

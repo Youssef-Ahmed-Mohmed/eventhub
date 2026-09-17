@@ -11,6 +11,7 @@
         "firebase-admin": "^14.4.0",
         "framer-motion": "^13.3.0",
         "jsonwebtoken": "^9.0.3",
+        "lucide-react": "^1.47.0",
         "next": "15.5.4",
         "react": "19.1.0",
         "react-dom": "19.1.0"

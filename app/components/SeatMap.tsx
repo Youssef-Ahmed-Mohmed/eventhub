@@ -6,13 +6,19 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface FirestoreSeat {
-    id: string; // مثل "seat-1"
+    id: string;
     number: number;
     status: "available" | "reserved" | "booked";
     reservedBy?: string;
 }
 
-export default function SeatMap({ eventId = "event1", userId }: { eventId?: string; userId?: string }) {
+interface SeatMapProps {
+    eventId?: string;
+    userId?: string;
+    onBooked?: (selectedSeats: string[]) => void;
+}
+
+export default function SeatMap({ eventId = "event1", userId, onBooked }: SeatMapProps) {
     const [seats, setSeats] = useState<FirestoreSeat[]>([]);
     const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
@@ -50,16 +56,14 @@ export default function SeatMap({ eventId = "event1", userId }: { eventId?: stri
     const ticketPrice = 750;
     const total = selectedSeats.length * ticketPrice;
 
-    // 2. إرسال الطلب لـ API الحجز
     const handleCheckout = async () => {
         if (selectedSeats.length === 0 || !userId) {
-            alert("برجاء اختيار مقعد وتسجيل الدخول أولاً");
+            alert("Please select a seat and sign in first.");
             return;
         }
 
         setLoading(true);
         try {
-            // حجز أول مقعد محدد كمثال، أو تنفيذهم معاً
             for (const seatId of selectedSeats) {
                 const res = await fetch("/api/reserve-seat", {
                     method: "POST",
@@ -71,10 +75,12 @@ export default function SeatMap({ eventId = "event1", userId }: { eventId?: stri
                 if (!res.ok) throw new Error(data.error);
             }
 
-            alert("تم حجز المقاعد بنجاح! جاري تحويلك للتأكيد...");
             setSelectedSeats([]);
+            if (onBooked) {
+                onBooked(selectedSeats);
+            }
         } catch (error: any) {
-            alert(error.message || "حدث خطأ أثناء حجز المقاعد");
+            alert(error.message || "There was a problem reserving your seats.");
         } finally {
             setLoading(false);
         }
@@ -190,7 +196,7 @@ export default function SeatMap({ eventId = "event1", userId }: { eventId?: stri
                             <div>
                                 <p className="text-sm text-gray-500">TOTAL</p>
                                 <p className="mt-2 text-2xl font-bold text-white">
-                                    {total.toLocaleString()} EGP
+                                    {total.toLocaleString("en-US")} EGP
                                 </p>
                             </div>
 

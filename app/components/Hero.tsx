@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Calendar, MapPin, Users } from "lucide-react";
 
@@ -66,18 +67,24 @@ export default function Hero() {
                         transition={{ duration: 0.7, delay: 0.5 }}
                         className="mt-8 flex flex-wrap gap-4"
                     >
-                        <button className="group flex items-center gap-3 rounded-full bg-white px-6 py-3 font-semibold text-black transition hover:scale-105">
+                        <Link
+                            href="/events"
+                            className="group flex items-center gap-3 rounded-full bg-white px-6 py-3 font-semibold text-black transition hover:scale-105"
+                        >
                             Explore Events
 
                             <ArrowRight
                                 size={18}
                                 className="transition-transform group-hover:translate-x-1"
                             />
-                        </button>
+                        </Link>
 
-                        <button className="rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white backdrop-blur-md transition hover:bg-white/10">
+                        <Link
+                            href="/dashboard/events"
+                            className="rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white backdrop-blur-md transition hover:bg-white/10"
+                        >
                             Create an Event
-                        </button>
+                        </Link>
                     </motion.div>
 
                     {/* Stats */}

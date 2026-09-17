@@ -1,45 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import EventCard from "./EventCard";
-
-const events = [
-    {
-        title: "Tech Summit 2026",
-        category: "Technology",
-        date: "October 24, 2026",
-        location: "Cairo, Egypt",
-        attendees: "1,284",
-        gradient:
-            "bg-gradient-to-br from-purple-600/80 via-blue-600/50 to-black",
-    },
-    {
-        title: "Design Forward",
-        category: "Design",
-        date: "November 08, 2026",
-        location: "Alexandria, Egypt",
-        attendees: "842",
-        gradient:
-            "bg-gradient-to-br from-pink-600/70 via-purple-600/40 to-black",
-    },
-    {
-        title: "Future AI",
-        category: "Artificial Intelligence",
-        date: "December 15, 2026",
-        location: "Dubai, UAE",
-        attendees: "2,430",
-        gradient:
-            "bg-gradient-to-br from-cyan-500/70 via-blue-600/40 to-black",
-    },
-];
+import { events } from "@/lib/mockData";
 
 export default function EventsSection() {
     return (
-        <section className="relative bg-[#050505] px-8 py-32">
+        <section className="relative bg-[#050505] px-8 py-32" id="events">
 
             <div className="mx-auto max-w-7xl">
 
-                {/* Heading */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -58,17 +29,19 @@ export default function EventsSection() {
                         </h2>
                     </div>
 
-                    <button className="w-fit rounded-full border border-white/10 px-5 py-3 text-sm text-gray-300 transition hover:bg-white/10 hover:text-white">
+                    <Link
+                        href="/events"
+                        className="w-fit rounded-full border border-white/10 px-5 py-3 text-sm text-gray-300 transition hover:bg-white/10 hover:text-white"
+                    >
                         View all events →
-                    </button>
+                    </Link>
 
                 </motion.div>
 
-                {/* Cards */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {events.map((event, index) => (
+                    {events.slice(0, 3).map((event, index) => (
                         <motion.div
-                            key={event.title}
+                            key={event.slug}
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -77,7 +50,16 @@ export default function EventsSection() {
                                 delay: index * 0.15,
                             }}
                         >
-                            <EventCard {...event} />
+                            <Link href={`/events/${event.slug}`} className="block">
+                                <EventCard
+                                    title={event.title}
+                                    category={event.category}
+                                    date={event.date}
+                                    location={event.location}
+                                    attendees={event.attendees}
+                                    gradient={event.gradient}
+                                />
+                            </Link>
                         </motion.div>
                     ))}
                 </div>
