@@ -1,0 +1,13 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/check-in/route": "/api/check-in",
+  "/api/confirm-booking/route": "/api/confirm-booking",
+  "/api/events/route": "/api/events",
+  "/api/generate-qr/route": "/api/generate-qr",
+  "/api/reserve-seat/route": "/api/reserve-seat",
+  "/api/verify-qr/route": "/api/verify-qr",
+  "/favicon.ico/route": "/favicon.ico",
+  "/dashboard/events/page": "/dashboard/events",
+  "/dashboard/page": "/dashboard",
+  "/page": "/"
+}

@@ -1,0 +1,89 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/app/_not-found/page-ce7eef4b0da30415.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/css/22c222d1d7a687e4.css",
+      "static/chunks/app/layout-f542bec8ab820860.js"
+    ],
+    "/api/check-in/route": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/app/api/check-in/route-56418b90b1d2b6a9.js"
+    ],
+    "/api/confirm-booking/route": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/app/api/confirm-booking/route-56418b90b1d2b6a9.js"
+    ],
+    "/api/events/route": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/app/api/events/route-56418b90b1d2b6a9.js"
+    ],
+    "/api/generate-qr/route": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/app/api/generate-qr/route-56418b90b1d2b6a9.js"
+    ],
+    "/api/reserve-seat/route": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/app/api/reserve-seat/route-56418b90b1d2b6a9.js"
+    ],
+    "/api/verify-qr/route": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/app/api/verify-qr/route-56418b90b1d2b6a9.js"
+    ],
+    "/dashboard/events/page": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/762-ddb1885fc36e05ed.js",
+      "static/chunks/874-6c9ab7f78e0c3d89.js",
+      "static/chunks/app/dashboard/events/page-bac72593a18aee2c.js"
+    ],
+    "/dashboard/page": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/762-ddb1885fc36e05ed.js",
+      "static/chunks/app/dashboard/page-eb2ef51399661474.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-0a4c18d5d57328c6.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-4efeec91c7871d79.js",
+      "static/chunks/main-app-5c087150d6d1958b.js",
+      "static/chunks/0e142730-4d93b820d0ef54a9.js",
+      "static/chunks/711f8d0a-c8d5f82036e31465.js",
+      "static/chunks/762-ddb1885fc36e05ed.js",
+      "static/chunks/957-b79e46796c759ed3.js",
+      "static/chunks/app/page-90960c9b003fbb98.js"
+    ]
+  }
+}
