@@ -1,5 +1,9 @@
 # NEXUS Events
 
+## Live Website
+
+[https://eventhub-i5pg.vercel.app/](https://eventhub-i5pg.vercel.app/)
+
 NEXUS Events is a full-stack event platform for discovering events, reserving seats, completing checkout, managing QR tickets, and reviewing community event submissions.
 
 ## Highlights
