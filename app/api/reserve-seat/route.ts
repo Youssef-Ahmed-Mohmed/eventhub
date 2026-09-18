@@ -1,36 +1,12 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdmin";
-
-export async function POST(req: Request) {
-    try {
-        const { eventId, seatId, userId } = await req.json();
-
-        if (!eventId || !seatId || !userId) {
-            return NextResponse.json({ error: "بيانات الحجز غير مكتملة" }, { status: 400 });
-        }
-
-        const seatRef = adminDb.doc(`events/${eventId}/seats/${seatId}`);
-        await adminDb.runTransaction(async (transaction) => {
-            const seat = await transaction.get(seatRef);
-
-            if (!seat.exists) {
-                throw new Error("المقعد غير موجود");
-            }
-
-            if (seat.data()?.status !== "available") {
-                throw new Error("المقعد محجوز بالفعل");
-            }
-
-            transaction.update(seatRef, {
-                status: "reserved",
-                reservedBy: userId,
-                reservedAt: new Date().toISOString(),
-            });
-        });
-
-        return NextResponse.json({ success: true });
-    } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : "تعذر حجز المقعد";
-        return NextResponse.json({ error: message }, { status: 409 });
-    }
+import { adminDb } from "@/lib/supabase/admin";
+import { getCurrentUser } from "@/lib/supabase/admin-access";
+export async function POST(request: Request) {
+  const user = await getCurrentUser();
+  const { eventId, seatId } = await request.json();
+  if (!user) return NextResponse.json({ error: "Please sign in before reserving a seat." }, { status: 401 });
+  if (!eventId || !seatId) return NextResponse.json({ error: "Missing booking information" }, { status: 400 });
+  const { data, error } = await adminDb.rpc("reserve_seat", { p_event_id: eventId, p_seat_id: seatId, p_user_id: user.id });
+  if (error) return NextResponse.json({ error: error.message }, { status: 409 });
+  return NextResponse.json({ ticketId: data.ticket_id });
 }

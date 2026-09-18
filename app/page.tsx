@@ -1,21 +1,14 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import EventsSection from "./components/EventsSection";
-import EventTimeline from "./components/EventTimeline";
-import FeaturesSection from "./components/FeaturesSection";
-import SeatMap from "./components/SeatMap";
-import LiveAttendance from "./components/LiveAttendance";
+"use client";
+
+import dynamic from "next/dynamic";
+
+// Browser extensions such as Dark Reader mutate SVG attributes before React hydrates.
+// Loading decorative sections after hydration keeps the server HTML stable.
+const Navbar = dynamic(() => import("./components/Navbar"), { ssr: false });
+const Hero = dynamic(() => import("./components/Hero"), { ssr: false });
+const EventTimeline = dynamic(() => import("./components/EventTimeline"), { ssr: false });
+const FeaturesSection = dynamic(() => import("./components/FeaturesSection"), { ssr: false });
 
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-[#050505]">
-      <Navbar />
-      <Hero />
-      <EventsSection />
-      <EventTimeline />
-      <FeaturesSection />
-      <SeatMap />
-      <LiveAttendance />
-    </main>
-  );
+  return <main className="min-h-screen bg-[#070812]"><Navbar /><Hero /><EventTimeline /><FeaturesSection /></main>;
 }

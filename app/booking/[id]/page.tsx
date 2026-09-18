@@ -1,67 +1,9 @@
 "use client";
-
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, MapPin, Ticket } from "lucide-react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import SeatMap from "@/app/components/SeatMap";
-import { getEventBySlug } from "@/lib/mockData";
-
-export default function BookingPage() {
-  const params = useParams<{ id: string }>();
-  const router = useRouter();
-  const event = getEventBySlug(params.id);
-
-  if (!event) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#050505] px-6 text-white">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Event not found</h1>
-          <Link href="/events" className="mt-6 inline-flex rounded-full border border-white/10 px-5 py-3 text-sm text-gray-300 hover:bg-white/5">
-            Browse events
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  const handleBooked = () => {
-    router.push(`/tickets/${event.slug}`);
-  };
-
-  return (
-    <main className="min-h-screen bg-[#050505] px-6 py-24 text-white md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-purple-400">Booking</p>
-            <h1 className="mt-3 text-4xl font-bold">{event.title}</h1>
-          </div>
-
-          <Link href={`/events/${event.slug}`} className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-gray-300 hover:bg-white/5">
-            <ArrowLeft size={16} />
-            Event details
-          </Link>
-        </div>
-
-        <div className="mb-8 rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-3 text-gray-300">
-              <Calendar size={18} className="text-purple-400" />
-              <span>{event.date}</span>
-            </div>
-            <div className="flex items-center gap-3 text-gray-300">
-              <MapPin size={18} className="text-purple-400" />
-              <span>{event.location}</span>
-            </div>
-            <div className="flex items-center gap-3 text-gray-300">
-              <Ticket size={18} className="text-purple-400" />
-              <span>From ${event.price}</span>
-            </div>
-          </div>
-        </div>
-
-        <SeatMap eventId={event.slug} userId="demo-attendee" onBooked={handleBooked} />
-      </div>
-    </main>
-  );
-}
+import { publicDb } from "@/lib/supabase/public";
+import { supabase } from "@/lib/subabase/client";
+type Event = { id: string; title: string; event_date: string; location: string; ticket_price: number };
+export default function BookingPage() { const { id } = useParams<{ id: string }>(); const router = useRouter(); const [event, setEvent] = useState<Event | null>(null), [ready, setReady] = useState(false); useEffect(() => { const load = async () => { const { data: { user } } = await supabase.auth.getUser(); if (!user) return router.replace(`/auth?returnTo=/booking/${id}`); const { data } = await publicDb.from("events").select("id,title,event_date,location,ticket_price").eq("id", id).single(); setEvent(data); setReady(true); }; void load(); }, [id, router]); if (!ready || !event) return <main className="min-h-screen bg-[#050505] p-20 text-center text-white">Loading secure booking…</main>; return <main className="min-h-screen bg-[#050505] px-6 py-20 text-white"><div className="mx-auto max-w-5xl"><Link href={`/events/${id}`} className="text-sm text-cyan-300">← Event details</Link><h1 className="mt-5 text-4xl font-bold">Reserve your seat</h1><p className="mt-3 text-gray-400">{event.title} · {new Date(event.event_date).toLocaleString()} · {event.location}</p><p className="mt-2 text-sm text-cyan-200">Step 1 of 2 — choose a seat, then complete payment.</p><div className="mt-10"><SeatMap eventId={event.id} price={Number(event.ticket_price)} onBooked={(ticketId) => router.push(`/checkout/${ticketId}`)} /></div></div></main>; }

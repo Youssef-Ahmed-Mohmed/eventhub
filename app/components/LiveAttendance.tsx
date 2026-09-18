@@ -26,7 +26,7 @@ export default function LiveAttendance() {
                     transition={{ duration: 0.7 }}
                     className="mb-14 text-center"
                 >
-                    <p className="mb-4 text-sm uppercase tracking-[0.3em] text-purple-400">
+                    <p className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-400">
                         Real-time analytics
                     </p>
 
@@ -48,7 +48,7 @@ export default function LiveAttendance() {
                 >
 
                     {/* Glow */}
-                    <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/10 blur-[100px]" />
+                    <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-500/10 blur-[100px]" />
 
                     <div className="relative">
 
@@ -65,7 +65,7 @@ export default function LiveAttendance() {
                                 </span>
                             </div>
 
-                            <Activity size={20} className="text-purple-400" />
+                            <Activity size={20} className="text-cyan-400" />
                         </div>
 
                         {/* Counter */}
@@ -110,7 +110,7 @@ export default function LiveAttendance() {
                                     whileInView={{ width: "64%" }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 1.5, ease: "easeOut" }}
-                                    className="h-full rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500"
+                                    className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-500"
                                 />
                             </div>
 

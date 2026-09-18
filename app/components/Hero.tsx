@@ -6,7 +6,7 @@ import { ArrowRight, Calendar, MapPin, Users } from "lucide-react";
 
 export default function Hero() {
     return (
-        <section className="relative flex min-h-screen items-center overflow-hidden bg-[#050505] px-8 pt-32">
+        <section className="relative flex min-h-screen items-center overflow-hidden bg-[#070812] px-8 pt-32">
 
             {/* Background Glow */}
             <motion.div
@@ -19,7 +19,7 @@ export default function Hero() {
                     repeat: Infinity,
                     ease: "easeInOut",
                 }}
-                className="absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 rounded-full bg-purple-600/20 blur-[120px]"
+                className="absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-[120px]"
             />
 
             <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
@@ -33,7 +33,7 @@ export default function Hero() {
                         transition={{ duration: 0.6 }}
                         className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 backdrop-blur-md"
                     >
-                        <span className="h-2 w-2 animate-pulse rounded-full bg-purple-400" />
+                        <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-300" />
                         The future of events
                     </motion.div>
 
@@ -45,7 +45,7 @@ export default function Hero() {
                     >
                         Create events
                         <br />
-                        <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-transparent">
                             people remember.
                         </span>
                     </motion.h1>
@@ -128,7 +128,7 @@ export default function Hero() {
                     >
 
                         <div className="mb-6 flex items-center justify-between">
-                            <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs text-purple-300">
+                            <span className="rounded-full bg-cyan-500/20 px-3 py-1 text-xs text-cyan-200">
                                 FEATURED EVENT
                             </span>
 
@@ -137,7 +137,14 @@ export default function Hero() {
                             </span>
                         </div>
 
-                        <div className="mb-6 h-48 rounded-2xl bg-gradient-to-br from-purple-600/40 via-blue-600/20 to-transparent" />
+                        <div className="relative mb-6 h-48 overflow-hidden rounded-2xl">
+                            <img
+                                src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=900&q=85"
+                                alt="Audience enjoying a live event"
+                                className="h-full w-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#09091a]/70 via-transparent to-cyan-500/20" />
+                        </div>
 
                         <h2 className="text-2xl font-bold text-white">
                             Tech Summit 2026

@@ -74,7 +74,7 @@ export default function CreateEventModal({
                             required
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-purple-500"
+                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-cyan-500"
                             placeholder="e.g. AI & Robotics Session"
                         />
                     </div>
@@ -86,7 +86,7 @@ export default function CreateEventModal({
                             required
                             value={formData.date}
                             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-purple-500"
+                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-cyan-500"
                         />
                     </div>
 
@@ -96,7 +96,7 @@ export default function CreateEventModal({
                             type="text"
                             value={formData.location}
                             onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-purple-500"
+                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-cyan-500"
                             placeholder="e.g. Hall E414 / Online"
                         />
                     </div>
@@ -107,7 +107,7 @@ export default function CreateEventModal({
                             rows={3}
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-purple-500"
+                            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm focus:outline-none focus:border-cyan-500"
                             placeholder="Brief details about the event..."
                         />
                     </div>
@@ -123,7 +123,7 @@ export default function CreateEventModal({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-5 py-2 rounded-xl bg-purple-600 text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition"
+                            className="px-5 py-2 rounded-xl bg-cyan-600 text-sm font-semibold hover:bg-cyan-700 disabled:opacity-50 transition"
                         >
                             {loading ? "Saving..." : "Create Event"}
                         </button>

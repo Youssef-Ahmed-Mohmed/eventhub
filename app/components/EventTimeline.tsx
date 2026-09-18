@@ -48,7 +48,7 @@ export default function EventTimeline() {
                     transition={{ duration: 0.7 }}
                     className="mb-20 text-center"
                 >
-                    <p className="mb-4 text-sm uppercase tracking-[0.3em] text-purple-400">
+                    <p className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-400">
                         The experience
                     </p>
 
@@ -73,7 +73,7 @@ export default function EventTimeline() {
                         whileInView={{ scaleY: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 2, ease: "easeInOut" }}
-                        className="absolute left-5 top-0 h-full w-px origin-top bg-gradient-to-b from-purple-400 via-pink-400 to-blue-400 md:left-1/2 md:-translate-x-1/2"
+                        className="absolute left-5 top-0 h-full w-px origin-top bg-gradient-to-b from-cyan-400 via-sky-400 to-blue-400 md:left-1/2 md:-translate-x-1/2"
                     />
 
                     {/* Sessions */}
@@ -116,7 +116,7 @@ export default function EventTimeline() {
                                     </div>
 
                                     {/* Center point */}
-                                    <div className="absolute left-5 top-0 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-purple-400/40 bg-[#080808] text-purple-300 shadow-[0_0_30px_rgba(168,85,247,0.25)] md:left-1/2">
+                                    <div className="absolute left-5 top-0 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-cyan-400/40 bg-[#080808] text-cyan-300 shadow-[0_0_30px_rgba(34,211,238,0.25)] md:left-1/2">
                                         <Icon size={17} />
                                     </div>
 
@@ -168,7 +168,7 @@ function TimelineContent({
             className={`max-w-md ${align === "right" ? "ml-auto pr-12" : "pl-12"
                 }`}
         >
-            <span className="text-sm font-medium text-purple-400">
+            <span className="text-sm font-medium text-cyan-400">
                 {session.time}
             </span>
 

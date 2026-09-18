@@ -82,7 +82,7 @@ export default function EventCard({
                         {attendees} attendees
                     </span>
 
-                    <span className="text-sm font-medium text-white transition group-hover:text-purple-400">
+                    <span className="text-sm font-medium text-white transition group-hover:text-cyan-400">
                         View event →
                     </span>
                 </div>

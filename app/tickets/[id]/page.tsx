@@ -1,52 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { adminDb } from "@/lib/supabase/admin";
 import TicketCard from "@/app/components/TicketCard";
-import { getEventBySlug } from "@/lib/mockData";
-
-export default async function TicketPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const event = getEventBySlug(id);
-
-  if (!event) {
-    notFound();
-  }
-
-  const ticketData = {
-    ticketId: "NEXUS-2026-8421",
-    eventId: event.slug,
-    eventName: event.title,
-    eventDate: event.date,
-    eventTime: event.time,
-    venue: event.venue,
-    seatNumber: "A12",
-    userName: "Ahmed Hassan",
-    userEmail: "ahmed@example.com",
-    price: event.price,
-  };
-
-  return (
-    <main className="min-h-screen bg-[#050505] px-6 py-20 text-white md:px-10">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-purple-400">Your ticket</p>
-            <h1 className="mt-3 text-4xl font-bold">Booking confirmed</h1>
-          </div>
-
-          <Link
-            href="/events"
-            className="inline-flex w-fit items-center rounded-full border border-white/10 px-5 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white"
-          >
-            View more events
-          </Link>
-        </div>
-
-        <TicketCard ticketData={ticketData} />
-      </div>
-    </main>
-  );
-}
+import { getCurrentUser, isCurrentUserAdmin } from "@/lib/supabase/admin-access";
+export default async function TicketPage({ params }: { params: Promise<{ id: string }> }) { const { id } = await params; const user = await getCurrentUser(); if (!user) notFound(); const { data: ticket } = await adminDb.from("tickets").select("id,user_id,status,events(title,event_date,location,ticket_price),seats(seat_number,status)").eq("id", id).single(); if (!ticket || (ticket.user_id !== user.id && !(await isCurrentUserAdmin()))) notFound(); const event = ticket.events as unknown as { title: string; event_date: string; location: string; ticket_price: number }; const seat = ticket.seats as unknown as { seat_number: number; status: string }; return <main className="min-h-screen bg-[#050505] px-6 py-20 text-white"><div className="mx-auto max-w-3xl"><Link href="/my-tickets" className="text-cyan-300">← My tickets</Link><h1 className="mt-5 text-4xl font-bold">{seat.status === "booked" ? "Booking confirmed" : "Payment pending"}</h1><TicketCard ticketId={ticket.id} eventName={event.title} date={event.event_date} location={event.location} seatNumber={seat.seat_number} paid={seat.status === "booked"} /></div></main>; }
