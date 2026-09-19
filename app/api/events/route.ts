@@ -5,7 +5,13 @@ import { getCurrentUser, isCurrentUserAdmin } from "@/lib/supabase/admin-access"
 export async function GET() {
   const { data, error } = await adminDb.from("events").select("*").order("event_date", { ascending: true });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ events: data });
+  const user = await getCurrentUser();
+  const admin = user ? await isCurrentUserAdmin() : false;
+  const events = (data ?? []).map((event) => ({
+    ...event,
+    canDelete: Boolean(user && (admin || event.created_by === user.id)),
+  }));
+  return NextResponse.json({ events, canReview: admin });
 }
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -38,4 +44,25 @@ export async function PATCH(request: Request) {
   if (error && decision === "reject") ({ data, error } = await adminDb.from("events").update({ status: "Completed" }).eq("id", id).select().single());
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ event: data });
+}
+
+export async function DELETE(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Please sign in to delete an event." }, { status: 401 });
+
+  const { id } = await request.json();
+  if (!id || typeof id !== "string") return NextResponse.json({ error: "A valid event id is required" }, { status: 400 });
+
+  const { data: event, error: lookupError } = await adminDb.from("events").select("id,created_by").eq("id", id).maybeSingle();
+  if (lookupError) return NextResponse.json({ error: lookupError.message }, { status: 500 });
+  if (!event) return NextResponse.json({ error: "Event not found" }, { status: 404 });
+
+  const admin = await isCurrentUserAdmin();
+  if (!admin && event.created_by !== user.id) {
+    return NextResponse.json({ error: "Only the event organizer or an admin can delete this event." }, { status: 403 });
+  }
+
+  const { error } = await adminDb.from("events").delete().eq("id", event.id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
 }
