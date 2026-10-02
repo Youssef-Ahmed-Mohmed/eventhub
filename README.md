@@ -1,15 +1,15 @@
-# NEXUS Events
+# eventshub
 
 ## Live Website
 
 [https://eventhub-i5pg.vercel.app/](https://eventhub-i5pg.vercel.app/)
 
-NEXUS Events is a full-stack event platform for discovering events, reserving seats, completing checkout, managing QR tickets, and reviewing community event submissions.
+eventshub is a full-stack event platform for discovering events, reserving seats, completing checkout, managing QR tickets, and reviewing community event submissions.
 
 ## Highlights
 
 - Event discovery with categories, event details, pricing, and live seat availability.
-- Email/password authentication and ready-to-configure Google, Facebook, and Instagram/Meta OAuth.
+- Supabase Email + Password authentication, Google OAuth, and GitHub OAuth.
 - Supabase-backed seat reservations that prevent duplicate reservations.
 - Demo checkout, secure signed QR tickets, and organizer QR check-in.
 - Personal ticket area for attendees.
@@ -40,11 +40,12 @@ copy .env.example .env.local
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-ADMIN_EMAILS=admin@example.com
 QR_SECRET_KEY=use-a-long-random-secret
 ```
 
 Never commit `.env.local` or the service-role key.
+
+`NEXT_PUBLIC_SUPABASE_URL` must be the project URL (`https://<project-ref>.supabase.co`), without `/rest/v1`.
 
 ## Supabase Setup
 
@@ -52,6 +53,7 @@ In **Supabase Dashboard → SQL Editor**, run these files in order:
 
 1. `supabase/schema.sql`
 2. `supabase/migrations/20260918_event_submission.sql`
+3. `supabase/migrations/20261002_profiles_and_account_deletion.sql`
 
 Then start the application:
 
@@ -61,23 +63,47 @@ npm run dev
 
 ## Admin Access
 
-Create a Supabase Auth user with an email in `ADMIN_EMAILS`, then sign in at `/admin/login`. Admins can use `/dashboard/events` to approve or reject submitted events.
+Create a user through Supabase Auth, then promote that user's profile in the SQL Editor (replace the UUID with the user's Auth ID):
 
-## OAuth Setup
-
-Enable Google and Facebook in **Supabase Dashboard → Authentication → Providers**. Add this callback URL in Supabase and in each provider configuration:
-
-```text
-https://your-domain.com/auth/callback
+```sql
+update public.profiles set role = 'admin' where id = '<auth user UUID>';
 ```
 
-For local development also add:
+Use `organizer` for event hosts. Organizers can manage and check in tickets for their own events. Admins can review submissions at `/dashboard/events` and manage any event. Attendees can submit events for review.
+
+## Supabase Auth Setup
+
+### Email + Password
+
+In **Supabase Dashboard > Authentication > Sign In / Providers > Email**, enable Email and password sign-in. Choose whether email confirmation is required. If enabled, configure email delivery and keep the app callback URLs below in the redirect allow list.
+
+### GitHub OAuth
+
+1. In **Supabase Dashboard > Authentication > Sign In / Providers > GitHub**, enable GitHub and copy the displayed **Callback URL**. It has this form:
+
+   ```text
+   https://<project-ref>.supabase.co/auth/v1/callback
+   ```
+
+2. Create a GitHub OAuth App in GitHub Developer Settings. Set its Homepage URL to your website. Set its **Authorization callback URL** to the Supabase Callback URL from step 1. Do not use your website's `/auth/callback` URL here.
+3. Copy the GitHub Client ID and Client Secret into the Supabase GitHub provider settings, then save.
+
+### Google OAuth
+
+1. In **Supabase Dashboard > Authentication > Sign In / Providers > Google**, enable Google and copy the displayed **Callback URL**.
+2. In Google Cloud Console, create or open the Web OAuth client. Add the Supabase Callback URL under **Authorized redirect URIs**.
+3. Copy the Google Client ID and Client Secret into the Supabase Google provider settings, then save. Keep the secret in Supabase; do not add it to browser code or commit the downloaded credentials JSON.
+
+### Supabase redirect URLs
+
+In **Supabase Dashboard > Authentication > URL Configuration**, set Site URL to your production site and add these app callback URLs under Redirect URLs:
 
 ```text
 http://localhost:3000/auth/callback
+https://eventhub-i5pg.vercel.app/auth/callback
 ```
 
-Instagram login is configured through a Meta/Facebook app with `instagram_basic` and an Instagram Business or Creator account.
+The app uses `/auth/callback` to exchange the Supabase Auth code for a session. Add any custom production domain there too. Supabase requires each `redirectTo` destination to match an allowed redirect URL.
 
 ## Payment Note
 
@@ -91,7 +117,7 @@ Checkout currently runs in demo mode: it confirms a reservation but does not cha
 4. Add the production domain to Supabase Auth redirect URLs.
 5. Deploy.
 
-Before launch, configure OAuth, a real payment provider, and a strong production `QR_SECRET_KEY`.
+Before launch, configure GitHub OAuth, a real payment provider, and a strong production `QR_SECRET_KEY`.
 
 ## Validation
 

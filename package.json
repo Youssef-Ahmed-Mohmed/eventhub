@@ -1,28 +1,31 @@
 {
-    "name": "event-platform",
-    "private": true,
-    "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start"
-    },
-    "dependencies": {
-        "@supabase/ssr": "^0.12.7",
-        "@supabase/supabase-js": "^2.116.0",
-        "framer-motion": "^13.3.0",
-        "jsonwebtoken": "^9.0.3",
-        "lucide-react": "^1.47.0",
-        "next": "15.5.25",
-        "react": "19.1.0",
-        "react-dom": "19.1.0"
-    },
-    "devDependencies": {
-        "@tailwindcss/postcss": "^4.1.11",
-        "@types/jsonwebtoken": "^9.0.10",
-        "@types/node": "^20.19.0",
-        "@types/react": "^19.1.0",
-        "@types/react-dom": "^19.1.0",
-        "tailwindcss": "^4.1.11",
-        "typescript": "^5.8.3"
-    }
+  "name": "event-platform",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "format": "prettier --write \"app/**/*.{ts,tsx}\" \"lib/**/*.ts\" middleware.ts next.config.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "framer-motion": "^13.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.47.0",
+    "next": "15.5.25",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.19.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "prettier": "^3.9.9",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.3"
+  }
 }

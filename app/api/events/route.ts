@@ -1,68 +1,172 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/supabase/admin";
-import { getCurrentUser, isCurrentUserAdmin } from "@/lib/supabase/admin-access";
+import {
+  canManageEvents,
+  getCurrentUser,
+  getCurrentUserRole,
+  isCurrentUserAdmin,
+} from "@/lib/supabase/admin-access";
+import {
+  eventDeleteSchema,
+  eventReviewSchema,
+  eventSchema,
+} from "@/lib/validation";
 
 export async function GET() {
-  const { data, error } = await adminDb.from("events").select("*").order("event_date", { ascending: true });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   const user = await getCurrentUser();
+  const role = user ? await getCurrentUserRole(user.id) : "attendee";
+  let query = adminDb
+    .from("events")
+    .select("*")
+    .order("event_date", { ascending: true });
+  if (role === "organizer")
+    query = query.or(
+      `status.in.(Upcoming,Live,Completed),created_by.eq.${user!.id}`,
+    );
+  else if (role !== "admin")
+    query = query.in("status", ["Upcoming", "Live", "Completed"]);
+  const { data, error } = await query;
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
   const admin = user ? await isCurrentUserAdmin() : false;
+  const manager = user ? await canManageEvents(user.id) : false;
   const events = (data ?? []).map((event) => ({
     ...event,
-    canDelete: Boolean(user && (admin || event.created_by === user.id)),
+    canDelete: Boolean(
+      user && (admin || (manager && event.created_by === user.id)),
+    ),
   }));
-  return NextResponse.json({ events, canReview: admin });
+  return NextResponse.json({
+    events,
+    canReview: admin,
+    canManageEvents: manager,
+  });
 }
 export async function POST(request: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Please sign in to create an event." }, { status: 401 });
+  if (!user)
+    return NextResponse.json(
+      { error: "Please sign in to create an event." },
+      { status: 401 },
+    );
   const admin = await isCurrentUserAdmin();
-  const body = await request.json();
-  const { title, event_date, location, description, category, status, ticket_price, capacity } = body;
-  if (!title || !event_date || !location || !capacity) return NextResponse.json({ error: "Title, date, location and capacity are required" }, { status: 400 });
-  const payload = { title, event_date, location, description: description || "", category: category || "General", status: admin ? (status || "Upcoming") : "Pending Review", created_by: user.id, ticket_price: Number(ticket_price) || 0, capacity: Number(capacity) };
-  let { data: event, error } = await adminDb.from("events").insert(payload).select().single();
-  // Backward-compatible fallback while the SQL migration is being applied.
-  if (error && !admin) {
-    const legacyPayload = { title, event_date, location, description: description || "", category: category || "General", status: "Draft", ticket_price: Number(ticket_price) || 0, capacity: Number(capacity) };
-    ({ data: event, error } = await adminDb.from("events").insert(legacyPayload).select().single());
+  const manager = await canManageEvents(user.id);
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
-  if (error || !event) return NextResponse.json({ error: error?.message || "Could not create event" }, { status: 500 });
-  const seats = Array.from({ length: event.capacity }, (_, index) => ({ event_id: event.id, seat_number: index + 1 }));
+  const validation = eventSchema.safeParse(body);
+  if (!validation.success)
+    return NextResponse.json(
+      {
+        error:
+          validation.error.issues[0]?.message ?? "Check the event details.",
+      },
+      { status: 400 },
+    );
+  const payload = {
+    ...validation.data,
+    status: manager ? "Upcoming" : "Pending Review",
+    created_by: user.id,
+  };
+  const { data: event, error } = await adminDb
+    .from("events")
+    .insert(payload)
+    .select()
+    .single();
+  if (error || !event)
+    return NextResponse.json(
+      { error: error?.message || "Could not create event" },
+      { status: 500 },
+    );
+  const seats = Array.from({ length: event.capacity }, (_, index) => ({
+    event_id: event.id,
+    seat_number: index + 1,
+  }));
   const { error: seatsError } = await adminDb.from("seats").insert(seats);
-  if (seatsError) return NextResponse.json({ error: seatsError.message }, { status: 500 });
+  if (seatsError)
+    return NextResponse.json({ error: seatsError.message }, { status: 500 });
   return NextResponse.json({ event }, { status: 201 });
 }
 
 export async function PATCH(request: Request) {
-  if (!(await isCurrentUserAdmin())) return NextResponse.json({ error: "Admin access required" }, { status: 403 });
-  const { id, decision } = await request.json();
-  if (!id || !["approve", "reject"].includes(decision)) return NextResponse.json({ error: "Invalid review request" }, { status: 400 });
+  if (!(await isCurrentUserAdmin()))
+    return NextResponse.json(
+      { error: "Admin access required" },
+      { status: 403 },
+    );
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
+  const validation = eventReviewSchema.safeParse(body);
+  if (!validation.success)
+    return NextResponse.json(
+      { error: "Invalid review request." },
+      { status: 400 },
+    );
+  const { id, decision } = validation.data;
   const status = decision === "approve" ? "Upcoming" : "Rejected";
-  let { data, error } = await adminDb.from("events").update({ status }).eq("id", id).select().single();
-  // Existing installations do not yet have Rejected in the original status constraint.
-  if (error && decision === "reject") ({ data, error } = await adminDb.from("events").update({ status: "Completed" }).eq("id", id).select().single());
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  const { data, error } = await adminDb
+    .from("events")
+    .update({ status })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ event: data });
 }
 
 export async function DELETE(request: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Please sign in to delete an event." }, { status: 401 });
+  if (!user)
+    return NextResponse.json(
+      { error: "Please sign in to delete an event." },
+      { status: 401 },
+    );
 
-  const { id } = await request.json();
-  if (!id || typeof id !== "string") return NextResponse.json({ error: "A valid event id is required" }, { status: 400 });
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
+  const validation = eventDeleteSchema.safeParse(body);
+  if (!validation.success)
+    return NextResponse.json(
+      { error: "A valid event id is required." },
+      { status: 400 },
+    );
+  const { id } = validation.data;
 
-  const { data: event, error: lookupError } = await adminDb.from("events").select("id,created_by").eq("id", id).maybeSingle();
-  if (lookupError) return NextResponse.json({ error: lookupError.message }, { status: 500 });
-  if (!event) return NextResponse.json({ error: "Event not found" }, { status: 404 });
+  const { data: event, error: lookupError } = await adminDb
+    .from("events")
+    .select("id,created_by")
+    .eq("id", id)
+    .maybeSingle();
+  if (lookupError)
+    return NextResponse.json({ error: lookupError.message }, { status: 500 });
+  if (!event)
+    return NextResponse.json({ error: "Event not found" }, { status: 404 });
 
   const admin = await isCurrentUserAdmin();
-  if (!admin && event.created_by !== user.id) {
-    return NextResponse.json({ error: "Only the event organizer or an admin can delete this event." }, { status: 403 });
+  if (
+    !(await canManageEvents(user.id)) ||
+    (!admin && event.created_by !== user.id)
+  ) {
+    return NextResponse.json(
+      { error: "Only the event organizer or an admin can delete this event." },
+      { status: 403 },
+    );
   }
 
   const { error } = await adminDb.from("events").delete().eq("id", event.id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }

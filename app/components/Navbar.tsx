@@ -1,7 +1,84 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/subabase/client";
-export default function Navbar() { const [email, setEmail] = useState<string | null>(null); useEffect(() => { supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null)); const { data } = supabase.auth.onAuthStateChange((_event, session) => setEmail(session?.user.email ?? null)); return () => data.subscription.unsubscribe(); }, []); const logout = async () => { await supabase.auth.signOut(); window.location.href = "/"; }; return <motion.nav initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: .6 }} className="fixed left-0 top-0 z-50 w-full px-5 py-5"><div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-[#101326]/80 px-5 py-3 shadow-lg backdrop-blur-xl"><Link href="/" className="text-xl font-black tracking-widest text-white">NEXUS<span className="text-cyan-300">.</span></Link><div className="hidden items-center gap-6 text-sm text-slate-300 md:flex"><Link href="/events" className="hover:text-white">Events</Link><Link href="/create-event" className="hover:text-white">Host an event</Link>{email && <Link href="/my-tickets" className="hover:text-white">My tickets</Link>}<Link href="/admin/login" className="hover:text-white">Organizer</Link></div>{email ? <button onClick={logout} className="rounded-full border border-cyan-300/30 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-300/10">Sign out</button> : <Link href="/auth" className="flex items-center gap-2 rounded-full bg-cyan-300 px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:scale-105">Sign in <ArrowUpRight size={16} /></Link>}</div></motion.nav>; }
+import { supabase } from "@/lib/supabase/client";
+export default function Navbar() {
+  const [email, setEmail] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth
+      .getUser()
+      .then(({ data }) => setEmail(data.user?.email ?? null));
+    const { data } = supabase.auth.onAuthStateChange((_event, session) =>
+      setEmail(session?.user.email ?? null),
+    );
+    return () => data.subscription.unsubscribe();
+  }, []);
+  const logout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
+  return (
+    <motion.nav
+      initial={{ y: -30, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="fixed left-0 top-0 z-50 w-full px-5 py-5"
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-[#101326]/80 px-5 py-3 shadow-lg backdrop-blur-xl">
+        <Link
+          href="/"
+          aria-label="eventshub home"
+          className="flex items-center"
+        >
+          <Image
+            src="/eventshub-logo.png"
+            alt="eventshub"
+            width={220}
+            height={48}
+            priority
+            className="h-9 w-auto"
+          />
+        </Link>
+        <div className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+          <Link href="/events" className="hover:text-white">
+            Events
+          </Link>
+          <Link href="/create-event" className="hover:text-white">
+            Host an event
+          </Link>
+          {email && (
+            <>
+              <Link href="/my-tickets" className="hover:text-white">
+                My tickets
+              </Link>
+              <Link href="/account" className="hover:text-white">
+                Account
+              </Link>
+            </>
+          )}
+          <Link href="/dashboard" className="hover:text-white">
+            Organizer
+          </Link>
+        </div>
+        {email ? (
+          <button
+            onClick={logout}
+            className="rounded-full border border-cyan-300/30 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-300/10"
+          >
+            Sign out
+          </button>
+        ) : (
+          <Link
+            href="/auth"
+            className="flex items-center gap-2 rounded-full bg-cyan-300 px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:scale-105"
+          >
+            Sign in <ArrowUpRight size={16} />
+          </Link>
+        )}
+      </div>
+    </motion.nav>
+  );
+}

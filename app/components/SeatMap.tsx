@@ -1,10 +1,111 @@
 "use client";
 import { useEffect, useState } from "react";
 import { publicDb } from "@/lib/supabase/public";
-type Seat = { id: string; seat_number: number; status: "available" | "reserved" | "booked" };
-export default function SeatMap({ eventId, price, onBooked }: { eventId: string; price: number; onBooked: (ticketId: string) => void }) {
-  const [seats, setSeats] = useState<Seat[]>([]), [selected, setSelected] = useState<string[]>([]), [loading, setLoading] = useState(false);
-  useEffect(() => { const load = async () => { const { data } = await publicDb.from("seats").select("id,seat_number,status").eq("event_id", eventId).order("seat_number"); setSeats((data as Seat[]) || []); }; load(); const channel = publicDb.channel(`seats-${eventId}`).on("postgres_changes", { event: "*", schema: "public", table: "seats", filter: `event_id=eq.${eventId}` }, load).subscribe(); return () => { publicDb.removeChannel(channel); }; }, [eventId]);
-  const reserve = async () => { if (selected.length !== 1) return; setLoading(true); try { const response = await fetch("/api/reserve-seat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventId, seatId: selected[0] }) }); const result = await response.json(); if (!response.ok) throw new Error(result.error); onBooked(result.ticketId); } catch (error) { alert(error instanceof Error ? error.message : "Could not reserve this seat."); } finally { setLoading(false); } };
-  return <section className="rounded-3xl border border-white/10 bg-white/[.04] p-6 text-white md:p-10"><div className="mx-auto mb-10 max-w-2xl rounded-xl bg-cyan-500/20 py-3 text-center text-sm font-semibold tracking-[.25em]">STAGE</div>{!seats.length ? <p className="py-10 text-center text-gray-400">Loading available seats…</p> : <div className="mx-auto grid max-w-2xl grid-cols-6 gap-3 md:grid-cols-10">{seats.map((seat) => { const unavailable = seat.status !== "available", isSelected = selected.includes(seat.id); return <button key={seat.id} disabled={unavailable} onClick={() => setSelected(isSelected ? [] : [seat.id])} className={`aspect-square rounded-lg text-xs font-bold ${unavailable ? "cursor-not-allowed bg-red-500/20 text-red-300" : isSelected ? "bg-cyan-500 text-white" : "bg-white/10 text-gray-300 hover:bg-white/20"}`}>{seat.seat_number}</button>; })}</div>}<div className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6"><p className="text-gray-400">{selected.length ? `Seat ${seats.find((seat) => seat.id === selected[0])?.seat_number} · ${price.toLocaleString()} EGP` : "Choose one available seat"}</p><button onClick={reserve} disabled={!selected.length || loading} className="rounded-full bg-white px-6 py-3 font-semibold text-black disabled:opacity-40">{loading ? "Reserving…" : "Confirm booking"}</button></div></section>;
+type Seat = {
+  id: string;
+  seat_number: number;
+  status: "available" | "reserved" | "booked";
+};
+export default function SeatMap({
+  eventId,
+  price,
+  onBooked,
+}: {
+  eventId: string;
+  price: number;
+  onBooked: (ticketId: string) => void;
+}) {
+  const [seats, setSeats] = useState<Seat[]>([]),
+    [selected, setSelected] = useState<string[]>([]),
+    [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await publicDb
+        .from("seats")
+        .select("id,seat_number,status")
+        .eq("event_id", eventId)
+        .order("seat_number");
+      setSeats((data as Seat[]) || []);
+    };
+    load();
+    const channel = publicDb
+      .channel(`seats-${eventId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "seats",
+          filter: `event_id=eq.${eventId}`,
+        },
+        load,
+      )
+      .subscribe();
+    return () => {
+      publicDb.removeChannel(channel);
+    };
+  }, [eventId]);
+  const reserve = async () => {
+    if (selected.length !== 1) return;
+    setLoading(true);
+    try {
+      const response = await fetch("/api/reserve-seat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventId, seatId: selected[0] }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+      onBooked(result.ticketId);
+    } catch (error) {
+      alert(
+        error instanceof Error ? error.message : "Could not reserve this seat.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <section className="rounded-3xl border border-white/10 bg-white/[.04] p-6 text-white md:p-10">
+      <div className="mx-auto mb-10 max-w-2xl rounded-xl bg-cyan-500/20 py-3 text-center text-sm font-semibold tracking-[.25em]">
+        STAGE
+      </div>
+      {!seats.length ? (
+        <p className="py-10 text-center text-gray-400">
+          Loading available seats…
+        </p>
+      ) : (
+        <div className="mx-auto grid max-w-2xl grid-cols-6 gap-3 md:grid-cols-10">
+          {seats.map((seat) => {
+            const unavailable = seat.status !== "available",
+              isSelected = selected.includes(seat.id);
+            return (
+              <button
+                key={seat.id}
+                disabled={unavailable}
+                onClick={() => setSelected(isSelected ? [] : [seat.id])}
+                className={`aspect-square rounded-lg text-xs font-bold ${unavailable ? "cursor-not-allowed bg-red-500/20 text-red-300" : isSelected ? "bg-cyan-500 text-white" : "bg-white/10 text-gray-300 hover:bg-white/20"}`}
+              >
+                {seat.seat_number}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      <div className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6">
+        <p className="text-gray-400">
+          {selected.length
+            ? `Seat ${seats.find((seat) => seat.id === selected[0])?.seat_number} · ${price.toLocaleString()} EGP`
+            : "Choose one available seat"}
+        </p>
+        <button
+          onClick={reserve}
+          disabled={!selected.length || loading}
+          className="rounded-full bg-white px-6 py-3 font-semibold text-black disabled:opacity-40"
+        >
+          {loading ? "Reserving…" : "Confirm booking"}
+        </button>
+      </div>
+    </section>
+  );
 }

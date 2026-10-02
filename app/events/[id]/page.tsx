@@ -1,4 +1,89 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/supabase/admin";
-export default async function EventPage({ params }: { params: Promise<{ id: string }> }) { const { id } = await params; const { data: event } = await adminDb.from("events").select("*").eq("id", id).single(); if (!event) notFound(); const { count: available } = await adminDb.from("seats").select("id", { count: "exact", head: true }).eq("event_id", id).eq("status", "available"); const remaining = available ?? 0, capacity = event.capacity || 1, reserved = capacity - remaining, percent = Math.round((reserved / capacity) * 100); return <main className="min-h-screen bg-[#070812] px-6 py-28 text-white"><div className="mx-auto max-w-5xl"><Link href="/events" className="text-cyan-300">← All events</Link><article className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#101326]"><div className="bg-gradient-to-r from-sky-700 via-blue-700 to-cyan-600 p-8 md:p-12"><p className="text-sm font-bold tracking-[.22em] text-cyan-100">{event.category}</p><h1 className="mt-4 text-5xl font-black">{event.title}</h1><p className="mt-4 max-w-2xl text-white/80">{event.description || "More details coming soon."}</p></div><div className="grid gap-8 p-8 md:grid-cols-[1.3fr_.7fr] md:p-12"><div><dl className="grid gap-5 text-slate-300 md:grid-cols-2"><div><dt className="text-xs text-slate-500">DATE & TIME</dt><dd className="mt-2">{new Date(event.event_date).toLocaleString()}</dd></div><div><dt className="text-xs text-slate-500">LOCATION</dt><dd className="mt-2">{event.location}</dd></div></dl><p className="mt-8 text-3xl font-bold">{Number(event.ticket_price).toLocaleString()} EGP</p></div><aside className="rounded-2xl border border-cyan-300/20 bg-cyan-300/5 p-6"><p className="text-sm font-semibold text-cyan-200">LIVE SEAT AVAILABILITY</p><p className="mt-3 text-4xl font-black">{remaining}<span className="text-lg text-slate-400"> / {capacity}</span></p><p className="mt-1 text-sm text-slate-400">seats remaining</p><div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-blue-500" style={{ width: `${percent}%` }} /></div><p className="mt-2 text-xs text-slate-400">{percent}% of seats already selected</p><Link href={`/booking/${id}`} className="mt-6 block rounded-xl bg-cyan-300 p-3 text-center font-bold text-slate-950">Reserve your seat</Link></aside></div></article></div></main>; }
+export default async function EventPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const { data: event } = await adminDb
+    .from("events")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (!event) notFound();
+  const { count: available } = await adminDb
+    .from("seats")
+    .select("id", { count: "exact", head: true })
+    .eq("event_id", id)
+    .eq("status", "available");
+  const remaining = available ?? 0,
+    capacity = event.capacity || 1,
+    reserved = capacity - remaining,
+    percent = Math.round((reserved / capacity) * 100);
+  return (
+    <main className="min-h-screen bg-[#070812] px-6 py-28 text-white">
+      <div className="mx-auto max-w-5xl">
+        <Link href="/events" className="text-cyan-300">
+          ← All events
+        </Link>
+        <article className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#101326]">
+          <div className="bg-gradient-to-r from-sky-700 via-blue-700 to-cyan-600 p-8 md:p-12">
+            <p className="text-sm font-bold tracking-[.22em] text-cyan-100">
+              {event.category}
+            </p>
+            <h1 className="mt-4 text-5xl font-black">{event.title}</h1>
+            <p className="mt-4 max-w-2xl text-white/80">
+              {event.description || "More details coming soon."}
+            </p>
+          </div>
+          <div className="grid gap-8 p-8 md:grid-cols-[1.3fr_.7fr] md:p-12">
+            <div>
+              <dl className="grid gap-5 text-slate-300 md:grid-cols-2">
+                <div>
+                  <dt className="text-xs text-slate-500">DATE & TIME</dt>
+                  <dd className="mt-2">
+                    {new Date(event.event_date).toLocaleString()}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">LOCATION</dt>
+                  <dd className="mt-2">{event.location}</dd>
+                </div>
+              </dl>
+              <p className="mt-8 text-3xl font-bold">
+                {Number(event.ticket_price).toLocaleString()} EGP
+              </p>
+            </div>
+            <aside className="rounded-2xl border border-cyan-300/20 bg-cyan-300/5 p-6">
+              <p className="text-sm font-semibold text-cyan-200">
+                LIVE SEAT AVAILABILITY
+              </p>
+              <p className="mt-3 text-4xl font-black">
+                {remaining}
+                <span className="text-lg text-slate-400"> / {capacity}</span>
+              </p>
+              <p className="mt-1 text-sm text-slate-400">seats remaining</p>
+              <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-blue-500"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-400">
+                {percent}% of seats already selected
+              </p>
+              <Link
+                href={`/booking/${id}`}
+                className="mt-6 block rounded-xl bg-cyan-300 p-3 text-center font-bold text-slate-950"
+              >
+                Reserve your seat
+              </Link>
+            </aside>
+          </div>
+        </article>
+      </div>
+    </main>
+  );
+}

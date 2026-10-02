@@ -1,3 +1,84 @@
 "use client";
 import { useEffect, useState } from "react";
-export default function TicketCard({ ticketId, eventName, date, location, seatNumber, paid }: { ticketId: string; eventName: string; date: string; location: string; seatNumber: number; paid: boolean }) { const [token, setToken] = useState(""); useEffect(() => { if (paid) fetch("/api/generate-qr", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ticketId }) }).then((r) => r.json()).then((data) => setToken(data.token || "")); }, [ticketId, paid]); const qrUrl = token ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(token)}` : ""; return <article className="mt-10 rounded-3xl border border-cyan-500/30 bg-white/[.04] p-8 shadow-2xl md:flex md:items-center md:justify-between"><div><p className="text-sm tracking-[.25em] text-cyan-300">{paid ? "OFFICIAL PASS" : "PAYMENT REQUIRED"}</p><h2 className="mt-3 text-3xl font-bold">{eventName}</h2><p className="mt-5 text-gray-300">{new Date(date).toLocaleString()}</p><p className="mt-2 text-gray-400">{location}</p><div className="mt-7 flex gap-8"><div><p className="text-xs text-gray-500">SEAT</p><p className="text-2xl font-bold text-cyan-300">{seatNumber}</p></div><div><p className="text-xs text-gray-500">TICKET ID</p><p className="font-mono text-sm">{ticketId.slice(0, 8)}</p></div></div></div><div className="mt-8 text-center md:mt-0">{paid ? (qrUrl ? <img className="mx-auto rounded-xl bg-white p-2" src={qrUrl} width="180" height="180" alt="Secure ticket QR code" /> : <p className="text-sm text-gray-400">Generating secure QR…</p>) : <a href={`/checkout/${ticketId}`} className="inline-block rounded-xl bg-white px-5 py-3 font-semibold text-black">Complete payment</a>}{paid && <button onClick={() => window.print()} className="mt-5 rounded-full border border-white/20 px-5 py-2 text-sm hover:bg-white/10">Print ticket</button>}</div></article>; }
+export default function TicketCard({
+  ticketId,
+  eventName,
+  date,
+  location,
+  seatNumber,
+  paid,
+}: {
+  ticketId: string;
+  eventName: string;
+  date: string;
+  location: string;
+  seatNumber: number;
+  paid: boolean;
+}) {
+  const [token, setToken] = useState("");
+  useEffect(() => {
+    if (paid)
+      fetch("/api/generate-qr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ticketId }),
+      })
+        .then((r) => r.json())
+        .then((data) => setToken(data.token || ""));
+  }, [ticketId, paid]);
+  const qrUrl = token
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(token)}`
+    : "";
+  return (
+    <article className="mt-10 rounded-3xl border border-cyan-500/30 bg-white/[.04] p-8 shadow-2xl md:flex md:items-center md:justify-between">
+      <div>
+        <p className="text-sm tracking-[.25em] text-cyan-300">
+          {paid ? "OFFICIAL PASS" : "PAYMENT REQUIRED"}
+        </p>
+        <h2 className="mt-3 text-3xl font-bold">{eventName}</h2>
+        <p className="mt-5 text-gray-300">{new Date(date).toLocaleString()}</p>
+        <p className="mt-2 text-gray-400">{location}</p>
+        <div className="mt-7 flex gap-8">
+          <div>
+            <p className="text-xs text-gray-500">SEAT</p>
+            <p className="text-2xl font-bold text-cyan-300">{seatNumber}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">TICKET ID</p>
+            <p className="font-mono text-sm">{ticketId.slice(0, 8)}</p>
+          </div>
+        </div>
+      </div>
+      <div className="mt-8 text-center md:mt-0">
+        {paid ? (
+          qrUrl ? (
+            <img
+              className="mx-auto rounded-xl bg-white p-2"
+              src={qrUrl}
+              width="180"
+              height="180"
+              alt="Secure ticket QR code"
+            />
+          ) : (
+            <p className="text-sm text-gray-400">Generating secure QR…</p>
+          )
+        ) : (
+          <a
+            href={`/checkout/${ticketId}`}
+            className="inline-block rounded-xl bg-white px-5 py-3 font-semibold text-black"
+          >
+            Complete payment
+          </a>
+        )}
+        {paid && (
+          <button
+            onClick={() => window.print()}
+            className="mt-5 rounded-full border border-white/20 px-5 py-2 text-sm hover:bg-white/10"
+          >
+            Print ticket
+          </button>
+        )}
+      </div>
+    </article>
+  );
+}

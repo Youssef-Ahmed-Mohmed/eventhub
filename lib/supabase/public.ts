@@ -1,2 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
-export const publicDb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!);
+import { getSupabaseUrl } from "@/lib/supabase/url";
+
+const url = getSupabaseUrl();
+const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+if (!url || !publishableKey)
+  throw new Error("Supabase public configuration is missing.");
+
+export const publicDb = createClient(url, publishableKey);

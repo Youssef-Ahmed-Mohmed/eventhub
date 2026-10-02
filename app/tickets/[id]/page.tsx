@@ -2,5 +2,55 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/supabase/admin";
 import TicketCard from "@/app/components/TicketCard";
-import { getCurrentUser, isCurrentUserAdmin } from "@/lib/supabase/admin-access";
-export default async function TicketPage({ params }: { params: Promise<{ id: string }> }) { const { id } = await params; const user = await getCurrentUser(); if (!user) notFound(); const { data: ticket } = await adminDb.from("tickets").select("id,user_id,status,events(title,event_date,location,ticket_price),seats(seat_number,status)").eq("id", id).single(); if (!ticket || (ticket.user_id !== user.id && !(await isCurrentUserAdmin()))) notFound(); const event = ticket.events as unknown as { title: string; event_date: string; location: string; ticket_price: number }; const seat = ticket.seats as unknown as { seat_number: number; status: string }; return <main className="min-h-screen bg-[#050505] px-6 py-20 text-white"><div className="mx-auto max-w-3xl"><Link href="/my-tickets" className="text-cyan-300">← My tickets</Link><h1 className="mt-5 text-4xl font-bold">{seat.status === "booked" ? "Booking confirmed" : "Payment pending"}</h1><TicketCard ticketId={ticket.id} eventName={event.title} date={event.event_date} location={event.location} seatNumber={seat.seat_number} paid={seat.status === "booked"} /></div></main>; }
+import {
+  getCurrentUser,
+  isCurrentUserAdmin,
+} from "@/lib/supabase/admin-access";
+export default async function TicketPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const user = await getCurrentUser();
+  if (!user) notFound();
+  const { data: ticket } = await adminDb
+    .from("tickets")
+    .select(
+      "id,user_id,status,events(title,event_date,location,ticket_price),seats(seat_number,status)",
+    )
+    .eq("id", id)
+    .single();
+  if (!ticket || (ticket.user_id !== user.id && !(await isCurrentUserAdmin())))
+    notFound();
+  const event = ticket.events as unknown as {
+    title: string;
+    event_date: string;
+    location: string;
+    ticket_price: number;
+  };
+  const seat = ticket.seats as unknown as {
+    seat_number: number;
+    status: string;
+  };
+  return (
+    <main className="min-h-screen bg-[#050505] px-6 py-20 text-white">
+      <div className="mx-auto max-w-3xl">
+        <Link href="/my-tickets" className="text-cyan-300">
+          ← My tickets
+        </Link>
+        <h1 className="mt-5 text-4xl font-bold">
+          {seat.status === "booked" ? "Booking confirmed" : "Payment pending"}
+        </h1>
+        <TicketCard
+          ticketId={ticket.id}
+          eventName={event.title}
+          date={event.event_date}
+          location={event.location}
+          seatNumber={seat.seat_number}
+          paid={seat.status === "booked"}
+        />
+      </div>
+    </main>
+  );
+}

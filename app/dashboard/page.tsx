@@ -1,6 +1,118 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-type Event = { id: string; title: string; status: string; event_date: string; ticket_price: number; capacity: number; live_attendance_count: number };
-export default function Dashboard() { const [events, setEvents] = useState<Event[]>([]), [qr, setQr] = useState(""), [checkin, setCheckin] = useState(""); useEffect(() => { fetch("/api/events").then((r) => r.json()).then((data) => setEvents(data.events || [])); }, []); const tickets = events.reduce((sum, event) => sum + event.capacity, 0); const verify = async () => { const response = await fetch("/api/verify-qr", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: qr }) }); const data = await response.json(); setCheckin(response.ok ? "Check-in successful." : data.error || "Check-in failed."); }; return <main className="min-h-screen bg-[#050505] px-6 py-12 text-white"><div className="mx-auto max-w-6xl"><div className="flex items-center justify-between"><div><p className="text-cyan-300">ADMIN</p><h1 className="mt-2 text-4xl font-bold">Organizer dashboard</h1></div><Link href="/dashboard/events" className="rounded-full bg-white px-5 py-3 font-semibold text-black">Manage events</Link></div><div className="mt-10 grid gap-4 md:grid-cols-3"><Stat label="Total events" value={events.length} /><Stat label="Seat capacity" value={tickets} /><Stat label="Checked in" value={events.reduce((sum, event) => sum + event.live_attendance_count, 0)} /></div><section className="mt-8 rounded-3xl border border-white/10 bg-white/[.04] p-6"><h2 className="text-xl font-bold">QR check-in</h2><p className="mt-2 text-sm text-gray-400">Paste the decoded QR token from your scanner.</p><div className="mt-4 flex flex-col gap-3 md:flex-row"><input value={qr} onChange={(e) => setQr(e.target.value)} placeholder="Ticket QR token" className="flex-1 rounded-xl bg-black/30 p-3" /><button onClick={verify} className="rounded-xl bg-white px-5 py-3 font-semibold text-black">Check in</button></div><p className="mt-3 text-sm text-cyan-200">{checkin}</p></section><section className="mt-8 rounded-3xl border border-white/10 bg-white/[.04] p-6"><h2 className="text-xl font-bold">Events</h2><div className="mt-5 space-y-3">{events.map((event) => <Link href={`/events/${event.id}`} key={event.id} className="flex items-center justify-between rounded-xl bg-black/20 p-4 hover:bg-white/5"><div><p className="font-semibold">{event.title}</p><p className="text-sm text-gray-400">{new Date(event.event_date).toLocaleString()}</p></div><div className="text-right"><p className="text-sm text-cyan-300">{event.status}</p><p className="text-sm text-gray-400">{event.live_attendance_count} checked in</p></div></Link>)}{!events.length && <p className="text-gray-400">No events yet.</p>}</div></section></div></main>; }
-function Stat({ label, value }: { label: string; value: number }) { return <div className="rounded-2xl border border-white/10 bg-white/[.04] p-6"><p className="text-sm text-gray-400">{label}</p><p className="mt-2 text-3xl font-bold">{value.toLocaleString()}</p></div>; }
+type Event = {
+  id: string;
+  title: string;
+  status: string;
+  event_date: string;
+  ticket_price: number;
+  capacity: number;
+  live_attendance_count: number;
+};
+export default function Dashboard() {
+  const [events, setEvents] = useState<Event[]>([]),
+    [qr, setQr] = useState(""),
+    [checkin, setCheckin] = useState("");
+  useEffect(() => {
+    fetch("/api/events")
+      .then((r) => r.json())
+      .then((data) => setEvents(data.events || []));
+  }, []);
+  const tickets = events.reduce((sum, event) => sum + event.capacity, 0);
+  const verify = async () => {
+    const response = await fetch("/api/verify-qr", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: qr }),
+    });
+    const data = await response.json();
+    setCheckin(
+      response.ok ? "Check-in successful." : data.error || "Check-in failed.",
+    );
+  };
+  return (
+    <main className="min-h-screen bg-[#050505] px-6 py-12 text-white">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-cyan-300">ORGANIZER CONSOLE</p>
+            <h1 className="mt-2 text-4xl font-bold">Organizer dashboard</h1>
+          </div>
+          <Link
+            href="/dashboard/events"
+            className="rounded-full bg-white px-5 py-3 font-semibold text-black"
+          >
+            Manage events
+          </Link>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <Stat label="Total events" value={events.length} />
+          <Stat label="Seat capacity" value={tickets} />
+          <Stat
+            label="Checked in"
+            value={events.reduce(
+              (sum, event) => sum + event.live_attendance_count,
+              0,
+            )}
+          />
+        </div>
+        <section className="mt-8 rounded-3xl border border-white/10 bg-white/[.04] p-6">
+          <h2 className="text-xl font-bold">QR check-in</h2>
+          <p className="mt-2 text-sm text-gray-400">
+            Paste the decoded QR token from your scanner.
+          </p>
+          <div className="mt-4 flex flex-col gap-3 md:flex-row">
+            <input
+              value={qr}
+              onChange={(e) => setQr(e.target.value)}
+              placeholder="Ticket QR token"
+              className="flex-1 rounded-xl bg-black/30 p-3"
+            />
+            <button
+              onClick={verify}
+              className="rounded-xl bg-white px-5 py-3 font-semibold text-black"
+            >
+              Check in
+            </button>
+          </div>
+          <p className="mt-3 text-sm text-cyan-200">{checkin}</p>
+        </section>
+        <section className="mt-8 rounded-3xl border border-white/10 bg-white/[.04] p-6">
+          <h2 className="text-xl font-bold">Events</h2>
+          <div className="mt-5 space-y-3">
+            {events.map((event) => (
+              <Link
+                href={`/events/${event.id}`}
+                key={event.id}
+                className="flex items-center justify-between rounded-xl bg-black/20 p-4 hover:bg-white/5"
+              >
+                <div>
+                  <p className="font-semibold">{event.title}</p>
+                  <p className="text-sm text-gray-400">
+                    {new Date(event.event_date).toLocaleString()}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-cyan-300">{event.status}</p>
+                  <p className="text-sm text-gray-400">
+                    {event.live_attendance_count} checked in
+                  </p>
+                </div>
+              </Link>
+            ))}
+            {!events.length && <p className="text-gray-400">No events yet.</p>}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[.04] p-6">
+      <p className="text-sm text-gray-400">{label}</p>
+      <p className="mt-2 text-3xl font-bold">{value.toLocaleString()}</p>
+    </div>
+  );
+}

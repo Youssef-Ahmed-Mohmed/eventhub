@@ -1,4 +1,78 @@
 import Link from "next/link";
 import { adminDb } from "@/lib/supabase/admin";
-const categoryImages: Record<string, string> = { Technology: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80", Music: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=900&q=80", Business: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80", Design: "https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=900&q=80", Sports: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=900&q=80", Education: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80" };
-export default async function EventsPage() { const { data } = await adminDb.from("events").select("*").in("status", ["Upcoming", "Live"]).order("event_date"); const events = data ?? []; return <main className="min-h-screen bg-[#070812] px-6 py-20 text-white"><div className="mx-auto max-w-6xl"><Link href="/" className="text-cyan-300">← Home</Link><h1 className="mt-5 text-5xl font-bold">Discover events</h1><p className="mt-3 max-w-xl text-gray-400">Experiences for every interest — choose your next memorable day.</p><div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">{events.map((event) => <Link key={event.id} href={`/events/${event.id}`} className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[.04] transition hover:-translate-y-1 hover:border-cyan-400/50"><div className="relative h-48 overflow-hidden"><img src={categoryImages[event.category] || categoryImages.Technology} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-110" /><div className="absolute inset-0 bg-gradient-to-t from-[#070812] via-transparent" /><p className="absolute bottom-4 left-5 rounded-full bg-black/45 px-3 py-1 text-xs text-cyan-200 backdrop-blur">{event.category}</p></div><div className="p-6"><h2 className="text-2xl font-bold">{event.title}</h2><p className="mt-5 text-gray-400">{new Date(event.event_date).toLocaleString()}</p><p className="mt-2 text-gray-400">{event.location}</p><p className="mt-6 border-t border-white/10 pt-5 font-semibold text-cyan-200">{Number(event.ticket_price).toLocaleString()} EGP <span className="float-right text-sm text-white group-hover:text-cyan-200">View event →</span></p></div></Link>)}</div>{!events.length && <p className="mt-12 text-gray-400">No events are currently available.</p>}</div></main>; }
+const categoryImages: Record<string, string> = {
+  Technology:
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
+  Music:
+    "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=900&q=80",
+  Business:
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80",
+  Design:
+    "https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=900&q=80",
+  Sports:
+    "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=900&q=80",
+  Education:
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80",
+};
+export default async function EventsPage() {
+  const { data } = await adminDb
+    .from("events")
+    .select("*")
+    .in("status", ["Upcoming", "Live"])
+    .order("event_date");
+  const events = data ?? [];
+  return (
+    <main className="min-h-screen bg-[#070812] px-6 py-20 text-white">
+      <div className="mx-auto max-w-6xl">
+        <Link href="/" className="text-cyan-300">
+          ← Home
+        </Link>
+        <h1 className="mt-5 text-5xl font-bold">Discover events</h1>
+        <p className="mt-3 max-w-xl text-gray-400">
+          Experiences for every interest — choose your next memorable day.
+        </p>
+        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {events.map((event) => (
+            <Link
+              key={event.id}
+              href={`/events/${event.id}`}
+              className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[.04] transition hover:-translate-y-1 hover:border-cyan-400/50"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={
+                    categoryImages[event.category] || categoryImages.Technology
+                  }
+                  alt=""
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#070812] via-transparent" />
+                <p className="absolute bottom-4 left-5 rounded-full bg-black/45 px-3 py-1 text-xs text-cyan-200 backdrop-blur">
+                  {event.category}
+                </p>
+              </div>
+              <div className="p-6">
+                <h2 className="text-2xl font-bold">{event.title}</h2>
+                <p className="mt-5 text-gray-400">
+                  {new Date(event.event_date).toLocaleString()}
+                </p>
+                <p className="mt-2 text-gray-400">{event.location}</p>
+                <p className="mt-6 border-t border-white/10 pt-5 font-semibold text-cyan-200">
+                  {Number(event.ticket_price).toLocaleString()} EGP{" "}
+                  <span className="float-right text-sm text-white group-hover:text-cyan-200">
+                    View event →
+                  </span>
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+        {!events.length && (
+          <p className="mt-12 text-gray-400">
+            No events are currently available.
+          </p>
+        )}
+      </div>
+    </main>
+  );
+}
